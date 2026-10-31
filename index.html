@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lecteur TMDB</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <form id="form">
+    <input id="tmdbId" inputmode="numeric" pattern="[0-9]+" placeholder="ID TMDB (ex. 603)" required aria-label="ID TMDB">
+    <input id="key" type="password" placeholder="Clé API TMDB" required aria-label="Clé API TMDB" autocomplete="off">
+    <button class="go">Lancer</button>
+  </form>
+
+  <div class="player" id="player">
+    <video id="v" playsinline preload="metadata"></video>
+
+    <div class="top">
+      <div class="title"><strong id="pTitle">Aucun film</strong><span id="pSub">Entre un ID TMDB</span></div>
+      <div class="tools">
+        <button class="ib" id="cc" data-i="cc" title="Sous-titres" aria-label="Sous-titres"></button>
+        <button class="ib" id="pip" data-i="pip" title="Mini-lecteur" aria-label="Mini-lecteur"></button>
+        <button class="ib fsb" data-i="fs" title="Plein écran (f)" aria-label="Plein écran"></button>
+      </div>
+    </div>
+
+    <button class="big" id="big" data-i="play" aria-label="Lecture"></button>
+
+    <div class="state" id="state"><div>
+      <div class="spin"></div><strong id="stateTitle"></strong><p id="stateMsg"></p>
+    </div></div>
+
+    <div class="bottom">
+      <div class="seek" id="seek" aria-label="Progression"><i class="rail"></i><i class="buf"></i><i class="fill"></i><b class="knob"></b></div>
+      <div class="row">
+        <button class="ib" id="play" data-i="play" aria-label="Lecture / pause (espace)"></button>
+        <button class="ib" id="mute" data-i="vol" aria-label="Muet (m)"></button>
+        <input class="vol" id="vol" type="range" min="0" max="1" step="0.05" value="1" aria-label="Volume">
+        <span class="time" id="time">0:00 / 0:00</span>
+        <span class="sp"></span>
+        <button class="chip" id="speed" aria-label="Vitesse de lecture">1x</button>
+        <button class="ib fsb" data-i="fs" aria-label="Plein écran"></button>
+      </div>
+    </div>
+
+    <div class="menu" id="menu" hidden></div>
+    <input type="file" id="subFile" accept=".vtt,.srt" hidden>
+  </div>
+
+  <section class="info" id="info" hidden>
+    <img id="poster" alt="">
+    <div>
+      <h2 id="iTitle"></h2>
+      <p class="meta" id="iMeta"></p>
+      <p class="tag" id="iTag"></p>
+      <p id="iText"></p>
+    </div>
+  </section>
+</div>
+<script src="providers.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
