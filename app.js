@@ -78,6 +78,7 @@ const loadHls = () => window.Hls ? Promise.resolve() : new Promise((ok, ko) => {
 
 function reset() {
   if (hls) { hls.destroy(); hls = null; }
+  P.querySelectorAll('iframe').forEach(f => f.remove());
   V.pause(); V.removeAttribute('src');
   V.querySelectorAll('track').forEach(t => t.remove());
   V.load();
@@ -102,7 +103,20 @@ async function addTrack(s, show) {
   if (show) [...V.textTracks].forEach(x => { if (x !== t.track) x.mode = 'disabled'; });
 }
 
+/* Source de type iframe : le fournisseur gère lui-même la lecture. */
+function embed(url) {
+  const f = document.createElement('iframe');
+  f.src = url;
+  f.allow = 'autoplay; fullscreen; encrypted-media; picture-in-picture';
+  f.allowFullscreen = true;
+  f.referrerPolicy = 'origin';
+  f.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;z-index:0';
+  P.append(f);
+  P.classList.add('ready');
+}
+
 async function load(src) {
+  if (src.type === 'iframe') return embed(src.url);
   if (src.type === 'hls' && !V.canPlayType('application/vnd.apple.mpegurl')) {
     await loadHls();
     hls = new Hls(); hls.loadSource(src.url); hls.attachMedia(V);
@@ -225,6 +239,15 @@ const wake = () => {
 };
 ['pointermove', 'pointerdown', 'keydown'].forEach(e => P.addEventListener(e, wake));
 
+/* Passe à la source suivante. */
+async function nextSource() {
+  const s = Providers.next();
+  if (!s) return;
+  reset();
+  $('#pSub').textContent = s.provider;
+  try { await load(s); } catch { nextSource(); }
+}
+
 document.addEventListener('keydown', e => {
   if (!P.classList.contains('ready')) return;
   if (/INPUT|TEXTAREA/.test(e.target.tagName) && e.target.type !== 'range') return;
@@ -237,6 +260,7 @@ document.addEventListener('keydown', e => {
   else if (k === 'ArrowDown') V.volume = Math.max(0, V.volume - .1);
   else if (k === 'm') V.muted = !V.muted;
   else if (k === 'f') fs();
+  else if (k === 'n') nextSource();
   else return;
   e.preventDefault();
 });
